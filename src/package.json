@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "amqplib": "^0.5.1",
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.1",
+    "dotenv": "^4.0.0",
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
+    "seneca-basic": "^0.5.0",
+    "seneca-entity": "^2.0.0",
+    "serve-static": "^1.13.1"
+  },
+  "name": "prometheus-to-rabbit",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jeffrey Shaver",
+  "license": "MIT"
+}
