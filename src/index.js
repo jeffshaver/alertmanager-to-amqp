@@ -9,6 +9,7 @@ const compression = require('compression')
 const serveStatic = require('serve-static')
 const bodyParser = require('body-parser')
 const { send } = require('./send')
+const { logger } = require('./logger')
 
 // const { SERVER_CERT_PATH, SERVER_KEY_PATH } = process.env
 // const serverOptions = {
@@ -23,18 +24,18 @@ app.use(compression())
 app.use(bodyParser.json())
 
 app.post('/', (req, res) => {
+  logger.info(req.body)
+
   send(JSON.stringify(req.body))
 
   res.status(200).send('ok')
 })
 
 app.use(function(err, req, res, next) {
-  console.error(err.stack)
+  logger.error(err.stack)
   res.status(500).send('Something broke!')
 })
 
 httpServer.listen(3000, () => {
-  /* eslint-disable no-console */
-  console.log('app listening on port 3000')
-  /* eslint-enable no-console */
+  logger.info('app listening on port 3000')
 })

@@ -8,6 +8,7 @@ ARG PORT=3000
 
 ENV PORT ${PORT}
 
+WORKDIR /opt/logs
 WORKDIR /opt/app
 
 COPY src/package.json /opt/app/package.json

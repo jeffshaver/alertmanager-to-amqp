@@ -1,4 +1,6 @@
 const amqp = require('amqplib')
+const logger = require('./logger')
+
 const { AMQP_ENDPOINT, QUEUE } = process.env
 
 async function send(message) {
@@ -9,10 +11,8 @@ async function send(message) {
     await channel.assertQueue(QUEUE)
     channel.sendToQueue(QUEUE, Buffer.from(message))
   } catch (e) {
-    console.warn(e)
+    logger.warn(e)
   }
 }
 
-module.exports = {
-  send
-}
+module.exports = { send }

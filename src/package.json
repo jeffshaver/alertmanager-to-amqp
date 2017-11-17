@@ -8,7 +8,8 @@
     "morgan": "^1.9.0",
     "seneca-basic": "^0.5.0",
     "seneca-entity": "^2.0.0",
-    "serve-static": "^1.13.1"
+    "serve-static": "^1.13.1",
+    "winston": "^3.0.0-rc1"
   },
   "name": "prometheus-to-rabbit",
   "version": "0.0.1",
