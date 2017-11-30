@@ -1,17 +1,13 @@
-const amqp = require('amqplib')
-const logger = require('./logger')
+const { logger } = require('./logger')
 
-const { AMQP_ENDPOINT, QUEUE } = process.env
-
-async function send(message) {
+async function send(connection, channel, queue, message) {
   try {
-    const connection = await amqp.connect(AMQP_ENDPOINT)
-    const channel = await connection.createChannel()
-
-    await channel.assertQueue(QUEUE)
-    channel.sendToQueue(QUEUE, Buffer.from(message))
+    await channel.assertQueue(queue)
+    channel.sendToQueue(queue, Buffer.from(message))
   } catch (e) {
     logger.warn(e)
+    channel.close()
+    connection.close()
   }
 }
 

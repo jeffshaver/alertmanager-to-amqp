@@ -8,6 +8,7 @@ const express = require('express')
 const compression = require('compression')
 const serveStatic = require('serve-static')
 const bodyParser = require('body-parser')
+const { connect } = require('./connect')
 const { send } = require('./send')
 const { logger } = require('./logger')
 
@@ -17,25 +18,32 @@ const { logger } = require('./logger')
 //   key: fs.readFileSync(SERVER_KEY_PATH)
 // }
 
-const app = express()
-const httpServer = http.createServer(app)
+start()
 
-app.use(compression())
-app.use(bodyParser.json())
+async function start() {
+  const { AMQP_ENDPOINT, QUEUE } = process.env
+  const { connection, channel } = await connect(AMQP_ENDPOINT)
 
-app.post('/', (req, res) => {
-  logger.info(req.body)
+  const app = express()
+  const httpServer = http.createServer(app)
 
-  send(JSON.stringify(req.body))
+  app.use(compression())
+  app.use(bodyParser.json())
 
-  res.status(200).send('ok')
-})
+  app.post('/', (req, res) => {
+    logger.info(req.body)
 
-app.use(function(err, req, res, next) {
-  logger.error(err.stack)
-  res.status(500).send('Something broke!')
-})
+    send(connection, channel, QUEUE, JSON.stringify(req.body))
 
-httpServer.listen(3000, () => {
-  logger.info('app listening on port 3000')
-})
+    res.status(200).send('ok')
+  })
+
+  app.use(function(err, req, res, next) {
+    logger.error(err.stack)
+    res.status(500).send('Something broke!')
+  })
+
+  httpServer.listen(3000, () => {
+    logger.info('app listening on port 3000')
+  })
+}
