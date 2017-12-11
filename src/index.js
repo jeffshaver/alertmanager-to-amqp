@@ -1,5 +1,6 @@
 require('dotenv').config({ path: '.env', silent: true })
 
+const { AMQP_ENDPOINT, QUEUE } = process.env
 const http = require('http')
 const fs = require('fs')
 const morgan = require('morgan')
@@ -8,9 +9,9 @@ const express = require('express')
 const compression = require('compression')
 const serveStatic = require('serve-static')
 const bodyParser = require('body-parser')
-const { connect } = require('./connect')
-const { send } = require('./send')
+const { ReconnectingAMQP } = require('./reconnecting-amqp')
 const { logger } = require('./logger')
+const amqp = new ReconnectingAMQP(AMQP_ENDPOINT)
 
 // const { SERVER_CERT_PATH, SERVER_KEY_PATH } = process.env
 // const serverOptions = {
@@ -21,11 +22,10 @@ const { logger } = require('./logger')
 start()
 
 async function start() {
-  const { AMQP_ENDPOINT, QUEUE } = process.env
-  const { connection, channel } = await connect(AMQP_ENDPOINT)
-
   const app = express()
   const httpServer = http.createServer(app)
+
+  await amqp.connect()
 
   app.use(compression())
   app.use(bodyParser.json())
@@ -33,7 +33,7 @@ async function start() {
   app.post('/', (req, res) => {
     logger.info(req.body)
 
-    send(connection, channel, QUEUE, JSON.stringify(req.body))
+    amqp.sendToQueue(QUEUE, JSON.stringify(req.body))
 
     res.status(200).send('ok')
   })
