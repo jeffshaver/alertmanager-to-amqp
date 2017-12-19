@@ -2,15 +2,16 @@ const amqp = require('amqplib')
 const { logger } = require('./logger')
 
 class ReconnectingAMQP {
-  constructor(endpoint) {
+  constructor(endpoint, options) {
     this.connection = null
     this.channel = null
     this.endpoint = endpoint
+    this.options = options
   }
 
   async connect() {
     try {
-      this.connection = await amqp.connect(this.endpoint)
+      this.connection = await amqp.connect(this.endpoint, this.options)
       logger.info(`Successfully connected to ${this.endpoint}`)
       this.channel = await this.connection.createChannel()
       logger.info('Successfully created channel')

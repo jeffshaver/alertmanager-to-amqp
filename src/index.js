@@ -1,6 +1,14 @@
 require('dotenv').config({ path: '.env', silent: true })
 
-const { AMQP_ENDPOINT, QUEUE } = process.env
+const {
+  AMQP_ENDPOINT,
+  CA_CERT_LOCATION,
+  CLIENT_CERT_LOCATION,
+  CLIENT_CERT_KEY_LOCATION,
+  CLIENT_KEY_LOCATION,
+  CLIENT_KEY_PASSPHRASE,
+  QUEUE
+} = process.env
 const http = require('http')
 const fs = require('fs')
 const morgan = require('morgan')
@@ -11,13 +19,44 @@ const serveStatic = require('serve-static')
 const bodyParser = require('body-parser')
 const { ReconnectingAMQP } = require('./reconnecting-amqp')
 const { logger } = require('./logger')
-const amqp = new ReconnectingAMQP(AMQP_ENDPOINT)
+let options = {}
 
-// const { SERVER_CERT_PATH, SERVER_KEY_PATH } = process.env
-// const serverOptions = {
-//   cert: fs.readFileSync(SERVER_CERT_PATH),
-//   key: fs.readFileSync(SERVER_KEY_PATH)
-// }
+if (
+  CLIENT_CERT_KEY_LOCATION !== undefined &&
+  (CLIENT_CERT_LOCATION !== undefined || CLIENT_KEY_LOCATION !== undefined)
+) {
+  logger.error(
+    'Paths for both a PKCS12 and CRT/KEY have been provided. You must only provide CLIENT_CERT_KEY_LOCATION or CLIENT_CERT_LOCATION and CLIENT_KEY_LOCATION'
+  )
+  process.exit(1)
+}
+
+const hasAmqpOptions =
+  CA_CERT_LOCATION ||
+  CLIENT_CERT_LOCATION ||
+  CLIENT_CERT_KEY_LOCATION ||
+  CLIENT_KEY_LOCATION ||
+  CLIENT_KEY_PASSPHRASE
+
+if (hasAmqpOptions) {
+  const readFile = path => {
+    try {
+      return path ? fs.readFileSync(path) : undefined
+    } catch (e) {
+      logger.error(`Tried to read file at path \`${e.path}\`. ${e.message}`)
+      process.exit(1)
+    }
+  }
+
+  let ca = [readFile(CA_CERT_LOCATION)]
+  let cert = readFile(CLIENT_CERT_LOCATION)
+  let key = readFile(CLIENT_KEY_LOCATION)
+  let passphrase = CLIENT_KEY_PASSPHRASE
+  let pfx = readFile(CLIENT_CERT_KEY_LOCATION)
+
+  options = { ca, cert, key, passphrase, pfx }
+}
+const amqp = new ReconnectingAMQP(AMQP_ENDPOINT, options)
 
 start()
 
