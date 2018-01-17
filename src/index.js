@@ -26,7 +26,7 @@ if (
   (CLIENT_CERT_LOCATION !== undefined || CLIENT_KEY_LOCATION !== undefined)
 ) {
   logger.error(
-    'Paths for both a PKCS12 and CRT/KEY have been provided. You must only provide CLIENT_CERT_KEY_LOCATION or CLIENT_CERT_LOCATION and CLIENT_KEY_LOCATION'
+    'Paths for both a PKCS12 and CRT/KEY have been provided. You must only provide `CLIENT_CERT_KEY_LOCATION` or `CLIENT_CERT_LOCATION` and `CLIENT_KEY_LOCATION`'
   )
   process.exit(1)
 }
