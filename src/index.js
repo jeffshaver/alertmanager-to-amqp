@@ -17,7 +17,7 @@ const express = require('express')
 const compression = require('compression')
 const serveStatic = require('serve-static')
 const bodyParser = require('body-parser')
-const { ReconnectingAMQP } = require('./reconnecting-amqp')
+const { ReconnectingAMQP } = require('reconnecting-amqp')
 const { logger } = require('./logger')
 let options = {}
 

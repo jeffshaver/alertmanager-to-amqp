@@ -6,6 +6,7 @@
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "morgan": "^1.9.0",
+    "reconnecting-amqp": "^0.0.3",
     "seneca-basic": "^0.5.0",
     "seneca-entity": "^2.0.0",
     "serve-static": "^1.13.1",

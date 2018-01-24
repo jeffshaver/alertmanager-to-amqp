@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:9.1.0
+FROM mhart/alpine-node:9.4.0
 
 MAINTAINER jeff_e_shaver
 
